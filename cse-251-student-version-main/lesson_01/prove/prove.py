@@ -119,12 +119,13 @@ def draw_triangles(tur):
         for y in range(-300, 350, 200):
             draw_triangle(tur, x-30, y-30+10, 60)
 
-
 def draw_rectangles(tur):
     """Draw a group of Rectangles"""
     for x in range(-300, 350, 200):
         for y in range(-300, 350, 200):
             draw_rectangle(tur, x-10, y+5, 20, 15)
+
+# Not trying to change the existing functions and mess them up!
 
 
 def run_no_threads(tur, log, main_turtle):
@@ -164,6 +165,22 @@ def run_no_threads(tur, log, main_turtle):
 
 def run_with_threads(tur, log, main_turtle):
     """Draw different shapes using threads"""
+    #Create a lock
+    lock = threading.Lock()
+
+    def draw_squares_wrapper():
+        with lock:
+            draw_squares(tur)
+    
+    def draw_circles_wrapper():
+         with lock:
+            draw_circles(tur)
+    def draw_triangles_wrapper():
+         with lock:
+            draw_triangles(tur)
+    def draw_rectangles_wrapper():
+         with lock:
+            draw_rectangles(tur)
 
     # Draw Coors system
     tur.pensize(0.5)
@@ -176,12 +193,16 @@ def run_with_threads(tur, log, main_turtle):
     # TODO - Start adding your code here.
     # You need to use 4 threads where each thread concurrently drawing one type of shape.
     # You are free to change any functions in this code except those we marked DO NOT CHANGE.
-    threads = []
-    threads.append(threading.Thread(target=draw_squares,args=(tur,)))
-    threads.append(threading.Thread(target=draw_circles, args=(tur, lock)))
-    threads.append(threading.Thread(target=draw_triangles, args=(tur, lock)))
-    threads.append(threading.Thread(target=draw_rectangles, args=(tur, lock)))
+    # putting all the threads here
 
+
+    
+    threads = [
+        threading.Thread(target=draw_squares_wrapper),
+        threading.Thread(target=draw_circles_wrapper),
+        threading.Thread(target=draw_triangles_wrapper),
+        threading.Thread(target=draw_rectangles_wrapper),
+    ]
     for thread in threads:
         thread.start()
 
