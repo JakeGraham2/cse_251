@@ -21,6 +21,8 @@ Instructions:
 - You should create new functions as needed instead of modifying existing functions.
 - No global variables.
 
+
+I think this is deficient
 """
 
 import math
