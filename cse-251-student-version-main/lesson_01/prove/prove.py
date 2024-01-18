@@ -2,7 +2,7 @@
 Course: CSE 251 
 Lesson: L01 Prove
 File:   prove.py
-Author: <Add name here>
+Author: Jake Graham
 
 Purpose: Drawing with Python Turtle
 
@@ -176,6 +176,17 @@ def run_with_threads(tur, log, main_turtle):
     # TODO - Start adding your code here.
     # You need to use 4 threads where each thread concurrently drawing one type of shape.
     # You are free to change any functions in this code except those we marked DO NOT CHANGE.
+    threads = []
+    threads.append(threading.Thread(target=draw_squares,args=(tur,)))
+    threads.append(threading.Thread(target=draw_circles, args=(tur, lock)))
+    threads.append(threading.Thread(target=draw_triangles, args=(tur, lock)))
+    threads.append(threading.Thread(target=draw_rectangles, args=(tur, lock)))
+
+    for thread in threads:
+        thread.start()
+
+    for thread in threads:
+        thread.join()
 
     log.step_timer('All drawing commands have been created')
 
