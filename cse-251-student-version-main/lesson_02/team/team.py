@@ -2,7 +2,7 @@
 Course: CSE 251 
 Lesson: L02 Team Activity
 File:   team.py
-Author: <Add name here>
+Author: Jacob Graham
 
 Purpose: Make threaded API calls with the Playing Card API http://deckofcardsapi.com
 
@@ -25,7 +25,23 @@ from cse251 import *
 class Request_thread(threading.Thread):
     # TODO - Add code to make an API call and return the results
     # https://realpython.com/python-requests/
-    pass
+    def __init__(self, url):
+        # Call the Thread class's init function
+        # threading.Thread.__init__(self)
+        super().__init__()
+        self.url = url
+        self.response = {}
+        self.status_code = {}
+
+    def run(self):
+        response = requests.get(self.url)
+        # Check the status code to see if the request succeeded.
+        self.status_code = response.status_code
+        if response.status_code == 200:
+            self.response = response.json()
+        else:
+            print('RESPONSE = ', response.status_code)
+
 
 class Deck:
 
@@ -37,7 +53,9 @@ class Deck:
 
     def reshuffle(self):
         print('Reshuffle Deck')
-        # TODO - add call to reshuffle
+        req = Request_Thread(rf'https://deckofcardsapi.com/api/deck/{self.id}/shuffle/')
+        req.start()
+        req.join()
 
 
     def draw_card(self):
@@ -61,7 +79,7 @@ if __name__ == '__main__':
     #        team_get_deck_id.py program once. You can have
     #        multiple decks if you need them
 
-    deck_id = 'ENTER ID HERE'
+    deck_id = '6tl8xl7etxrn'
 
     # Testing Code >>>>>
     deck = Deck(deck_id)
