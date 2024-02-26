@@ -1,0 +1,8 @@
+#pool when you need a lot of data
+#start = 100000000
+#range_count = 100000
+# data = [i for i in range(start,start + range_count)]
+
+#with mp.Pool(mp.cpu_count()) as p:
+   #p.map(doit,data)
+   #list comprehension 

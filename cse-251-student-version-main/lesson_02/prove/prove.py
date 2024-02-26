@@ -2,7 +2,7 @@
 Course: CSE 251 
 Lesson: L02 Prove
 File:   prove.py
-Author: <Add name here>
+Author: Jacob Graham
 
 Purpose: Retrieve Star Wars details from a server
 
@@ -37,7 +37,7 @@ this dictionary to make other API calls for data.
    "starships": "http://127.0.0.1:8790/starships/"
 }
 """
-
+# I got super lost pretty quickly 
 from datetime import datetime, timedelta
 import requests
 import json
@@ -54,21 +54,37 @@ call_count = 0
 
 
 # TODO Add your threaded class definition here
+class APIThread(threading.Thread):
+    def __init__(self, url, result_dict, key=None):
+        threading.Thread.__init__(self)
+        self.url = url
+        self.result_dict = result_dict
+        self.key = key
 
 
 # TODO Add any functions you need here
+
+#I don't know what to do
+
+def get_top_api_urls(log):
+    top_urls = {}
+    api_thread = APIThread(TOP_API_URL, top_urls)
+    api_thread.start()
+    api_thread.join()
+    log.write("Top API URLs retrieved")
+    return top_urls
+
 
 
 def main():
     log = Log(show_terminal=True)
     log.start_timer('Starting to retrieve data from the server')
+  
 
     # TODO Retrieve Top API urls
-
+    top_urls = get_top_api_urls(log)
     # TODO Retrieve Details on film 6
-
     # TODO Display results
-
     log.stop_timer('Total Time To complete')
     log.write(f'There were {call_count} calls to the server')
     

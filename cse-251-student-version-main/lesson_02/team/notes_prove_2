@@ -1,0 +1,7 @@
+'''every api call needs to be in its own thread.
+shouldn't have too much of a problem with the main thread.
+'''
+
+# value: string, int, float, boolean
+# reference: list, dict, set, objects
+# make a class that can do an api call and something that can return the data
