@@ -2,7 +2,7 @@
 Course: CSE 251 
 Lesson: L05 Prove
 File:   prove.py
-Author: <Add name here>
+Author: Jacob Graham
 
 Purpose: Assignment 05 - Factories and Dealers
 
@@ -87,32 +87,38 @@ class Queue251():
 class Factory(threading.Thread):
     """ This is a factory.  It will create cars and place them on the car queue """
 
-    def __init__(self):
+    def __init__(self,car_queue,barrier):
+        threading.Thread.__init__(self)
+        self.car_queue = car_queue
+        self.barrier = barrier
+        
         self.cars_to_produce = random.randint(200, 300) # DO NOT change
 
 
     def run(self):
         # TODO produce the cars, the send them to the dealerships
-
-        # TODO wait until all of the factories are finished producing cars
-
-        # TODO "Wake up/signal" the dealerships one more time.  Select one factory to do this
-        pass
-
-
+        for _ in range(self.cars_to_produce):
+            car = Car() 
+            self.car_queue.put(car)
+        self.barrier.wait()
 
 class Dealer(threading.Thread):
     """ This is a dealer that receives cars """
 
-    def __init__(self):
-        pass
+    def __init__(self, car_queue, barrier):
+        threading.Thread.__init__(self)
+        self.car_queue = car_queue
+        self.barrier = barrier
 
     def run(self):
         while True:
-            # TODO handle a car
-
+           car = self.car_queue.get()
+           if car is None:
+            break
+        print(f'Dealer {self.dealer_id} received: {car.info()}')
+           
             # Sleep a little - don't change.  This is the last line of the loop
-            time.sleep(random.random() / (SLEEP_REDUCE_FACTOR + 0))
+        time.sleep(random.random() / (SLEEP_REDUCE_FACTOR + 0))
 
 
 
@@ -120,29 +126,49 @@ def run_production(factory_count, dealer_count):
     """ This function will do a production run with the number of
         factories and dealerships passed in as arguments.
     """
-
+   
     # TODO Create semaphore(s) if needed
+    #semaphore = threading.Semaphore(MAX_QUEUE_SIZE)
     # TODO Create queue
+    car_queue = Queue251()
     # TODO Create lock(s) if needed
     # TODO Create barrier
+    barrier = threading.Barrier(factory_count + dealer_count)
 
     # This is used to track the number of cars received by each dealer
     dealer_stats = list([0] * dealer_count)
-
+    # I don't know if this will work well but we'll see
     # TODO create your factories, each factory will create a random amount of cars; your code must account for this.
     # NOTE: You have no control over how many cars a factory will create in this assignment.
+    factories = [Factory(car_queue,barrier) for _ in range(factory_count)]
 
     # TODO create your dealerships
+    dealerships = [Dealer(car_queue, barrier) for i in range(dealer_count)]
+
 
     log.start_timer()
 
     # TODO Start all dealerships
-
+    for dealer in dealerships:
+        dealer.start()
     # TODO Start all factories
+        
+    for factory in factories:
+        factory.start()
 
+    for factory in factories:
+        factory.join()
+
+
+    for dealer in dealerships:
+        dealer.join()
+        dealer_stats += dealer.stats
+
+
+   
     # This is used to track the number of cars produced by each factory NOTE: DO NOT pass this into
     # your factories! You must collect this data here in `run_production` after the factories are finished.
-    factory_stats = []
+    factory_stats = [factory.cars_to_produce for factory in factories]
 
     # TODO Wait for the factories and dealerships to complete; do not forget to get the factories stats
 
