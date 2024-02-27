@@ -63,8 +63,11 @@ class APIThread(threading.Thread):
 
 
 # TODO Add any functions you need here
+def people_thread(url, people):
+    t_1 = threading.Thread(target= url, args=(people, ))
+    t_1.start()
+    t_1.join()
 
-#I don't know what to do
 
 def get_top_api_urls(log):
     top_urls = {}
@@ -83,8 +86,13 @@ def main():
 
     # TODO Retrieve Top API urls
     top_urls = get_top_api_urls(log)
+
+
     # TODO Retrieve Details on film 6
+
     # TODO Display results
+
+
     log.stop_timer('Total Time To complete')
     log.write(f'There were {call_count} calls to the server')
     
