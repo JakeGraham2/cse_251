@@ -13,6 +13,8 @@ below before submitting this file:
 
 TODO:
 
+I think having 2 was more of a placeholder than anything as this program wouldn't run without the create_tasks.py working. So that's my justification for it.
+
 Add your comments here on the pool sizes that you used for your assignment and why they were the best choices.
 """
 
@@ -36,11 +38,11 @@ TYPE_NAME   = 'name'
 
 # TODO: Change the pool sizes and explain your reasoning in the header comment
 
-PRIME_POOL_SIZE = 1
-WORD_POOL_SIZE  = 1
-UPPER_POOL_SIZE = 1
-SUM_POOL_SIZE   = 1
-NAME_POOL_SIZE  = 1
+PRIME_POOL_SIZE = 2
+WORD_POOL_SIZE  = 2
+UPPER_POOL_SIZE = 2
+SUM_POOL_SIZE   = 2
+NAME_POOL_SIZE  = 2
 
 # Global lists to collect the task results
 result_primes = []
@@ -65,7 +67,7 @@ def is_prime(n: int):
     return True
 
 
-def task_prime(value):
+def task_prime(value, callback):
     """
     Use the is_prime() above
     Add the following to the global list:
@@ -73,10 +75,13 @@ def task_prime(value):
             - or -
         {value} is not prime
     """
-    pass
+    if is_prime(value):
+        callback(f'{value} is prime')
+    else:
+        callback(f'{value} is not prime')
 
 
-def task_word(word):
+def task_word(word, callback):
     """
     search in file 'words.txt'
     Add the following to the global list:
@@ -84,7 +89,11 @@ def task_word(word):
             - or -
         {word} not found *****
     """
-    pass
+    with open('words.txt', 'r') as file:
+        if word in file.read():
+            callback(f'{word} Found')
+        else:
+            callback(f'{word} not found')
 
 
 def task_upper(text):
@@ -92,7 +101,7 @@ def task_upper(text):
     Add the following to the global list:
         {text} ==>  uppercase version of {text}
     """
-    pass
+    return text.upper()
 
 
 def task_sum(start_value, end_value):
@@ -100,7 +109,7 @@ def task_sum(start_value, end_value):
     Add the following to the global list:
         sum of {start_value:,} to {end_value:,} = {total:,}
     """
-    pass
+    
 
 
 def task_name(url):
@@ -111,7 +120,14 @@ def task_name(url):
             - or -
         {url} had an error receiving the information
     """
-    pass
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        name = data.get('name', 'Unknown')
+        return f'{url} has name {name}', None  # Return result and no error
+    else:
+        return None, f'{url} had an error receiving the information: {response.status_code}'
+
 
 
 def main():
@@ -119,6 +135,12 @@ def main():
     log.start_timer()
 
     # TODO Create process pools
+    prime_pool = mp.Pool(PRIME_POOL_SIZE)
+    word_pool = mp.Pool(WORD_POOL_SIZE)
+    upper_pool = mp.Pool(UPPER_POOL_SIZE)
+    sum_pool = mp.Pool(SUM_POOL_SIZE)
+    name_pool = mp.Pool(NAME_POOL_SIZE)
+
 
     # TODO change the following to start the pools
     
@@ -132,19 +154,24 @@ def main():
         count += 1
         task_type = task['task']
         if task_type == TYPE_PRIME:
-            task_prime(task['value'])
+            prime_pool.apply_async(task_prime, (task['value'], result_primes.append))
         elif task_type == TYPE_WORD:
-            task_word(task['word'])
+            word_pool.apply_async(task_word, (task['word'], result_words.append))
         elif task_type == TYPE_UPPER:
-            task_upper(task['text'])
+            upper_pool.apply_async(task_upper, (task['text'], result_upper.append))
         elif task_type == TYPE_SUM:
-            task_sum(task['start'], task['end'])
+            sum_pool.apply_async(task_sum, (task['start'], task['end'], result_sums.append))
         elif task_type == TYPE_NAME:
-            task_name(task['url'])
+            name_pool.apply_async(task_name, (task['url'], result_names.append))
         else:
             log.write(f'Error: unknown task type {task_type}')
 
     # TODO wait on the pools
+    pools = [prime_pool, word_pool, upper_pool, sum_pool, name_pool]
+
+    for pool in pools:
+        pool.close()
+        pool.join()
 
     # DO NOT change any code below this line!
     #---------------------------------------------------------------------------
