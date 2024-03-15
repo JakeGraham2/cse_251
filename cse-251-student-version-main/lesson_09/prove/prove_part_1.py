@@ -2,7 +2,7 @@
 Course: CSE 251 
 Lesson: L09 Prove Part 1
 File:   prove_part_1.py
-Author: <Add name here>
+Author: Jacob Graham
 
 Purpose: Part 1 of prove 9, finding the path to the end of a maze using recursion.
 
