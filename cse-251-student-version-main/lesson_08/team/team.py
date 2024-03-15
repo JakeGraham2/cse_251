@@ -2,7 +2,7 @@
 Course: CSE 251 
 Lesson: L08 Team
 File:   team.py
-Author: <Add name here>
+Author: Jacob Graham
 
 Purpose: Gain hands on experience with the concepts covered in this lesson, such as cache coherence,
          recursion, and analyzing what is happening at the hardware level of your programs.
@@ -105,8 +105,8 @@ def merge_sort_process(arr):
 def main():
     merges = [
         (merge_sort, ' Normal Merge Sort '), 
-        (merge_sort_thread, ' Threaded Merge Sort '), 
-        (merge_sort_process, ' Processes Merge Sort ')
+        #(merge_sort_thread, ' Threaded Merge Sort '), 
+        #(merge_sort_process, ' Processes Merge Sort ')
     ]
 
     for merge_function, desc in merges:
@@ -128,3 +128,11 @@ def main():
 
 if __name__ == '__main__':
     main()
+    # Common mistake when learning recursion no choices return just return. You have to return something to tell you that you are at a dead end for the maze, Highly recommend a boolean for doing so.Part 2 don't keep a thread going just kill it.
+    #solve is going to have base cases and if it finds the end it returns true
+    # get poss _ moves and it returns false
+    # for pos in poss moves
+    # check if the recursion returns true or false
+    # don't return if it returns false
+    # if any path returns true you return true
+    # needs to go through all possbilities before it says it's stuck.

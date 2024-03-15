@@ -21,11 +21,11 @@ position:
 
 What would be your strategy?
 
-<Answer here>
+Use existing end position stuff
 
 Why would it work?
 
-<Answer here>
+I'm crying on the inside
 
 """
 
@@ -79,15 +79,54 @@ def get_color():
 
 
 # TODO: Add any function(s) you need, if any, here.
+def solve_maze_threaded(maze, pos, color, stop_event):
+    global thread_count
 
+    if stop_event.is_set():
+        return
+
+    row, col = pos
+
+    if maze.at_end(row, col):
+        stop_event.set()
+        return
+
+    maze.move(row, col, color)
+
+    moves = maze.get_possible_moves(row, col)
+
+    if not moves:
+        maze.restore(row, col)
+        return
+
+    threads = []
+    for move in moves[:-1]:
+        next_color = get_color()
+        thread = threading.Thread(target=solve_maze_threaded, args=(maze, move, next_color, stop_event))
+        thread.start()
+        threads.append(thread)
+        thread_count += 1
+
+    solve_maze_threaded(maze, moves[-1], color, stop_event)
+
+    for thread in threads:
+        thread.join()
+    # I commented this out because I figured it would keep back tracking and I was right 
+    #if not stop_event.is_set():
+        #maze.restore(row, col)
 
 def solve_find_end(maze):
     """ Finds the end position using threads. Nothing is returned. """
     # When one of the threads finds the end position, stop all of them.
     global stop
-    # TODO: Complete this function.
+    global thread_count
     stop = False
+    thread_count += 1
 
+    starting_pos = maze.get_start_pos()
+    initial_color = get_color()
+
+    solve_maze_threaded(maze, starting_pos, initial_color, threading.Event())
 
 def find_end(log, filename, delay):
     """ Do not change this function """
@@ -157,3 +196,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+    #start the threads before your original path goes somewhere else. Create as many threads you can start them all and then join them all.
+    # bad practice to let the os close what you've written. Good habit to close filestream. When you are in the work force please don't be lazy because things will be used for months or years.
